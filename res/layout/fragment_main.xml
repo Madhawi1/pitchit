@@ -1,0 +1,105 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.madhawi.pitchit.MainActivity$PlaceholderFragment" >
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/select_note" />
+
+ <RadioGroup
+     android:id="@+id/rgNotes"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignLeft="@+id/textView1"
+     android:layout_below="@+id/textView1"
+     android:layout_marginTop="24dp"
+     android:orientation="vertical" >
+
+     <RadioButton
+         android:id="@+id/radioC"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:checked="true"
+         android:text="@string/c" />
+
+     <RadioButton
+         android:id="@+id/radioD"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="@string/d" />
+
+     <RadioButton
+         android:id="@+id/radioE"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="@string/e" />
+
+     <RadioButton
+         android:id="@+id/radioF"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="@string/f" />
+
+     <RadioButton
+         android:id="@+id/radioG"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="@string/g" />
+
+     <RadioButton
+         android:id="@+id/radioA"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="@string/a" />
+
+     <RadioButton
+         android:id="@+id/radioB"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="@string/b" />
+ </RadioGroup>
+
+ <Button
+     android:id="@+id/btnPlay"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignLeft="@+id/rgNotes"
+     android:layout_below="@+id/rgNotes"
+     android:text="@string/play" 
+     android:onClick="play"
+     android:textSize="15sp"/>
+  
+  
+ 
+
+ <Button
+     android:id="@+id/btnRecord"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignTop="@+id/rgNotes"
+     android:layout_toRightOf="@+id/textView1"
+     android:text="@string/record"
+   
+     android:textSize="15sp" />
+
+ <Button
+     android:id="@+id/btnStop"
+     style="?android:attr/buttonStyleSmall"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignLeft="@+id/btnRecord"
+     android:layout_below="@+id/btnRecord"
+     android:layout_marginTop="31dp"
+     android:text="@string/stop" 
+     />
+ 
+ </RelativeLayout>
