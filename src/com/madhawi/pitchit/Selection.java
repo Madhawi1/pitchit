@@ -47,6 +47,10 @@ public class Selection extends Activity{
 	 int bufferSize;
 	 int samplerate =8000;
 	 private Complex[] complexData;
+	 private int matchCount=0;
+	 private int lowCount=0;
+	 private int highCount=0;
+	 
 
 	 Handler handler = new Handler();
 	 
@@ -73,12 +77,61 @@ public class Selection extends Activity{
 		 }
 		 
 		 Complex[] fftResult = FFT.fft(complexData);
-		 Toast.makeText(Selection.this, "fft1  "+fftResult[0],Toast.LENGTH_LONG).show();
-		 Toast.makeText(Selection.this, "fft2  "+fftResult[1],Toast.LENGTH_LONG).show();
-		 Toast.makeText(Selection.this, "fft3  "+fftResult[10],Toast.LENGTH_LONG).show();
-		 Toast.makeText(Selection.this, "fftlength "+fftResult.length,Toast.LENGTH_LONG).show();
+
+		 double arg[]=new double[fftResult.length];
+		 double mag[]=new double[fftResult.length];
+		 String str="";
+		 
+		/* for (int i=0;i<fftResult.length;i++){
+			 arg[i]=Math.atan2(fftResult[i].re(),fftResult[i].im());
+			 mag[i]=Math.sqrt(fftResult[i].re()*fftResult[i].re()+fftResult[i].im()*fftResult[i].im());
+			// System.err.print(mag[i]+",");
+			 str=str+mag[i]+",";
+			 
+		 }*/
+		 //System.err.println(str);
+		 int index=0;
+		 double max=0;
+		 matchCount=0;
+		 for (int i=0;i<fftResult.length;i++){
+			 double magnitude=fftResult[i].re()*fftResult[i].re()+fftResult[i].im()*fftResult[i].im();
+			 if(magnitude>max){
+				 max=magnitude;
+				 index=i;
+				 }
+			 comparePitch(((double)samplerate*index)/fftResult.length);
+		 }
+		 double frequency=0;
+		 frequency=((double)samplerate*index)/fftResult.length;
+		 
+		 if(matchCount>=1000){
+			 Toast.makeText(Selection.this, "Match ",Toast.LENGTH_LONG).show();
+			 
+		 }
+		 else if(lowCount>highCount){
+			 Toast.makeText(Selection.this, "Low",Toast.LENGTH_LONG).show();
+			 
+		 }
+		 else{
+			 Toast.makeText(Selection.this, "High ",Toast.LENGTH_LONG).show();
+			 
+		 }
 				 
 		 
+	 }
+	 public void comparePitch(double voiceFrequency){
+		double lowPitch= freqOfTone-(freqOfTone*0.015);
+		double highPitch= freqOfTone+(freqOfTone*0.015);
+		if(voiceFrequency>=lowPitch && voiceFrequency <= highPitch){
+			matchCount++;
+		}
+		else if(voiceFrequency<lowPitch){
+			lowCount++;
+		}
+		else{
+			highCount++;
+		}
+	
 	 }
 	 public void startRecording1(){
 		 trackPitch();
