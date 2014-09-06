@@ -75,12 +75,8 @@
      android:layout_alignLeft="@+id/rgNotes"
      android:layout_below="@+id/rgNotes"
      android:text="@string/play" 
-     android:onClick="play"
      android:textSize="15sp"/>
   
-  
- 
-
  <Button
      android:id="@+id/btnRecord"
      android:layout_width="wrap_content"

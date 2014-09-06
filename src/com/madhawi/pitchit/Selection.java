@@ -39,9 +39,10 @@ public class Selection extends Activity{
 	 private double freqOfTone = 261.63; // hz
 	 private final byte generatedSnd[] = new byte[2 * numSamples];
 	 private Thread recordingThread = null;
+	 private boolean isPlaying=false;
 	
 	 //variables for tracking pitch
-	 private boolean recording=false;
+	 private boolean isRecording=false;
 	 AudioRecord recorder;
 	 short[] audioData;
 	 int bufferSize;
@@ -64,7 +65,7 @@ public class Selection extends Activity{
 		//instantiate the AudioRecorder
 	 recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,samplerate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT,bufferSize); 
 	 	
-	 recording = true; //variable to use start or stop recording
+	 isRecording = true; //variable to use start or stop recording
 	 audioData = new short [bufferSize]; //short array that pcm data is put into.
 
 	 }
@@ -93,17 +94,19 @@ public class Selection extends Activity{
 		 int index=0;
 		 double max=0;
 		 matchCount=0;
+		 double frequency=0;
 		 for (int i=0;i<fftResult.length;i++){
 			 double magnitude=fftResult[i].re()*fftResult[i].re()+fftResult[i].im()*fftResult[i].im();
 			 if(magnitude>max){
 				 max=magnitude;
 				 index=i;
 				 }
-			 comparePitch(((double)samplerate*index)/fftResult.length);
+			 frequency=((double)samplerate*index)/fftResult.length;
+			 comparePitch(frequency);
+			 str=str+frequency+",";
+			
 		 }
-		 double frequency=0;
-		 frequency=((double)samplerate*index)/fftResult.length;
-		 
+
 		 if(matchCount>=1000){
 			 Toast.makeText(Selection.this, "Match ",Toast.LENGTH_LONG).show();
 			 
@@ -139,7 +142,7 @@ public class Selection extends Activity{
 		 final Thread recordingThread = new Thread(new Runnable() {
 	            public void run() {
 	                
-	                    	while(recording){
+	                    	while(isRecording){
 	           	       		 recorder.read(audioData,0,bufferSize);
 	           	       		}
 	                    }
@@ -150,7 +153,7 @@ public class Selection extends Activity{
 	 }
 	 public void stopRecording1(){
 		 if (null != recorder) {
-		        recording = false;
+		        isRecording = false;
 		        Toast.makeText(Selection.this, "Done " ,Toast.LENGTH_LONG).show();
 		    	
 		        recorder.stop();
@@ -167,32 +170,48 @@ public class Selection extends Activity{
 	 private void setButtonHandlers() {
 		    ((Button) findViewById(R.id.btnRecord)).setOnClickListener(btnClick);
 		    ((Button) findViewById(R.id.btnStop)).setOnClickListener(btnClick);
-		}
+		    ((Button) findViewById(R.id.btnPlay)).setOnClickListener(btnClick);
+			
+	 }
 
 	 private View.OnClickListener btnClick = new View.OnClickListener() {
 		    public void onClick(View v) {
 		        switch (v.getId()) {
 		        case R.id.btnRecord: {
-		            enableButtons(true);
+		            enableButtons_Rec(true);
 		            startRecording1();
 		            break;
 		        }
 		        case R.id.btnStop: {
-		            enableButtons(false);
+		            enableButtons_Rec(false);
 		            stopRecording1();
 		            break;
 		        }
+		        case R.id.btnPlay: {
+		            enableButtons_Play(true);
+		            play();
+		            break;
+		        }
+		        
 		        }
 		    }
 		};
-	 private void enableButton(int id, boolean isEnable) {
+	//Enable the selected button
+	private void enableButton(int id, boolean isEnable) {
 		    ((Button) findViewById(id)).setEnabled(isEnable);
 		}
-
-		private void enableButtons(boolean isRecording) {
+	 //Select buttons which need to be enabled when recording voice
+	private void enableButtons_Rec(boolean isRecording) {
 		    enableButton(R.id.btnRecord, !isRecording);
 		    enableButton(R.id.btnStop, isRecording);
 		    enableButton(R.id.btnPlay, !isRecording);
+		}
+	
+	//Select buttons which need to be enabled when playing a note
+	private void enableButtons_Play(boolean isPlaying) {
+		    enableButton(R.id.btnRecord, !isPlaying);
+		    enableButton(R.id.btnStop, !isPlaying);
+		    enableButton(R.id.btnPlay, !isPlaying);
 		}
 
 		
@@ -206,9 +225,10 @@ public class Selection extends Activity{
 
 }
 	//play the selected note
-	public void play(View view){
+	public void play(){
 		
 		 final RadioGroup rgNotes = (RadioGroup) findViewById(R.id.rgNotes);
+		 isPlaying=true;
 		
 		 //get the selected note from the group of radio buttons
 		 RadioButton selectRadio = (RadioButton) findViewById(rgNotes.getCheckedRadioButtonId());
@@ -219,30 +239,7 @@ public class Selection extends Activity{
          char noteC=note.charAt(0);
 	 
          //Set the frequency of the selected note
-         switch(noteC){
-         	case 'C':
-         		freqOfTone=261.63;
-         		break;
-         	case 'D':
-         		freqOfTone=293.66;
-         		break;
-         	case 'E':
-         		freqOfTone=329.63;
-         		break;
-         	case 'F':
-         		freqOfTone=349.23;
-         		break;
-         	case 'G':
-         		freqOfTone=392.00;
-         		break;
-         	case 'A':
-         		freqOfTone=440;
-         		break;
-         	case 'B':
-         		freqOfTone=493.88;
-         		break;
-	 }
-	
+         freqOfTone=getFrequency(noteC);
 	 
       final Thread thread = new Thread(new Runnable() {
       public void run() {
@@ -251,12 +248,39 @@ public class Selection extends Activity{
 
               public void run() {
                   playSound();
+                 
+                isPlaying =false;
+                enableButtons_Play(isPlaying);
+                	
+                  
               }
           });
       }
   });
-  thread.start();
- 
+    thread.start();
+  	
+	}
+	//Get frequency of a note
+	public double getFrequency(char note){
+		 switch(note){
+      	case 'C':
+      		return(261.63);
+      	case 'D':
+      		return(293.66);
+      	case 'E':
+      		return(329.63);
+      	case 'F':
+      		return(349.23);
+      	case 'G':
+      		return(392.00);
+      	case 'A':
+      		return(440);
+      	case 'B':
+      		return(493.88);
+      	default:
+      		return (261.63);
+	 }
+
 	}
 	
 	//Generate the tone
