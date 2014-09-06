@@ -402,6 +402,11 @@ public class Selection extends Activity{
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
+		if(isRecording){
+			stopRecording1();
+			enableButtons_Rec(isRecording);
+			
+		}
 	}
 	
 	
