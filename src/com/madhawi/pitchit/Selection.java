@@ -95,19 +95,21 @@ public class Selection extends Activity{
 		 double max=0;
 		 matchCount=0;
 		 double frequency=0;
-		 for (int i=0;i<fftResult.length;i++){
+		 int minValue=(int)254.258*fftResult.length/samplerate;
+		 int maxValue=(int)555.29*fftResult.length/samplerate;
+		 
+		 for (int i=minValue;i<maxValue;i++){
 			 double magnitude=fftResult[i].re()*fftResult[i].re()+fftResult[i].im()*fftResult[i].im();
 			 if(magnitude>max){
 				 max=magnitude;
 				 index=i;
 				 }
-			 frequency=((double)samplerate*index)/fftResult.length;
-			 comparePitch(frequency);
-			 str=str+frequency+",";
-			
+			 
 		 }
-
-		 if(matchCount>=1000){
+		 frequency=((double)samplerate*index)/(double)fftResult.length;
+		 //comparePitch(frequency);
+		 //str=str+frequency+",";
+		 if(matchCount>=10){
 			 Toast.makeText(Selection.this, "Match ",Toast.LENGTH_LONG).show();
 			 
 		 }
