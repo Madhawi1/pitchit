@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RatingBar;
 import android.widget.Toast;
 
 public class Selection extends Activity{
@@ -52,6 +53,9 @@ public class Selection extends Activity{
 	 private int lowCount=0;
 	 private int highCount=0;
 	 
+	 //variables for giving feedback
+	 public RatingBar feedbackBar = (RatingBar) findViewById(R.id.feedbackBar);
+		
 
 	 Handler handler = new Handler();
 	 
@@ -106,10 +110,17 @@ public class Selection extends Activity{
 				 }
 			 
 		 }
+		 for (int i=0;i<fftResult.length;i++){
+			 double magnitude=fftResult[i].re()*fftResult[i].re()+fftResult[i].im()*fftResult[i].im();
+			 str=str+Math.pow(magnitude, .5)+",";
+		 }
+		 float rating= Float.parseFloat("2.5");
+		 feedbackBar.setRating(rating);
 		 frequency=((double)samplerate*index)/(double)fftResult.length;
 		 //comparePitch(frequency);
 		 //str=str+frequency+",";
-		 if(matchCount>=10){
+		 Toast.makeText(Selection.this, "f: "+freqOfTone+" f2: "+frequency,Toast.LENGTH_LONG).show();
+	/*	 if(matchCount>=10){
 			 Toast.makeText(Selection.this, "Match ",Toast.LENGTH_LONG).show();
 			 
 		 }
@@ -120,7 +131,7 @@ public class Selection extends Activity{
 		 else{
 			 Toast.makeText(Selection.this, "High ",Toast.LENGTH_LONG).show();
 			 
-		 }
+		 }*/
 				 
 		 
 	 }
@@ -138,7 +149,42 @@ public class Selection extends Activity{
 		}
 	
 	 }
-	 public void startRecording1(){
+	 public void makeFeedback(double voiceFrequency){
+		 double difference=freqOfTone-voiceFrequency;
+			if(difference<1){
+				feedbackBar.setRating(5);
+			}
+			else if(difference<2){
+				feedbackBar.setRating((float)4.5);
+			}
+
+			else if(difference<3){
+				feedbackBar.setRating(4);
+			}
+
+			else if(difference<10){
+				feedbackBar.setRating((float)3.5);
+			}
+
+			else if(difference<15){
+				feedbackBar.setRating(3);
+			}
+
+			else if(difference<20){
+				feedbackBar.setRating((float)2.5);
+			}
+
+			else if(difference<25){
+				feedbackBar.setRating((float)2);
+			}
+			else if(difference<30){
+				feedbackBar.setRating((float)1);
+			}
+			else
+				feedbackBar.setRating((float)0.5);
+			
+	 }
+	 public void startRecording(){
 		 trackPitch();
 		 recorder.startRecording();
 		 final Thread recordingThread = new Thread(new Runnable() {
@@ -153,7 +199,7 @@ public class Selection extends Activity{
 	        recordingThread.start();
 		 
 	 }
-	 public void stopRecording1(){
+	 public void stopRecording(){
 		 if (null != recorder) {
 		        isRecording = false;
 		        Toast.makeText(Selection.this, "Done " ,Toast.LENGTH_LONG).show();
@@ -181,12 +227,12 @@ public class Selection extends Activity{
 		        switch (v.getId()) {
 		        case R.id.btnRecord: {
 		            enableButtons_Rec(true);
-		            startRecording1();
+		            startRecording();
 		            break;
 		        }
 		        case R.id.btnStop: {
 		            enableButtons_Rec(false);
-		            stopRecording1();
+		            stopRecording();
 		            break;
 		        }
 		        case R.id.btnPlay: {
@@ -251,6 +297,16 @@ public class Selection extends Activity{
               public void run() {
                   playSound();
                  
+                 /* final Thread watingThread = new Thread(new Runnable() {
+      	            public void run() {*/
+      	            	try {
+							Thread.sleep(3000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+      	          //  }});
+                 // watingThread.start();
                 isPlaying =false;
                 enableButtons_Play(isPlaying);
                 	
@@ -340,7 +396,7 @@ public class Selection extends Activity{
 	}
 	
 	//Start recording voice
-	private void startRecording() {
+	private void startRecording1() {
 			
 		 try {
 			  //create a file with prefix 'sound' and suffix '.3gp'
@@ -371,7 +427,7 @@ public class Selection extends Activity{
 		  }
 	
 	//Stop recording voice	
-	private void stopRecording() {
+	private void stopRecording1() {
 		
 	    mRecorder.stop();
 	    //Releases the resources associated with the recorder

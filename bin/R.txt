@@ -239,7 +239,7 @@ int id action_context_bar 0x7f06001d
 int id action_menu_divider 0x7f060016
 int id action_menu_presenter 0x7f060017
 int id action_mode_close_button 0x7f060024
-int id action_settings 0x7f060049
+int id action_settings 0x7f06004a
 int id activity_chooser_view_content 0x7f060025
 int id always 0x7f06000b
 int id beginning 0x7f060011
@@ -257,6 +257,7 @@ int id edit_query 0x7f060030
 int id end 0x7f060013
 int id expand_activities_button 0x7f060026
 int id expanded_menu 0x7f06002c
+int id feedbackBar 0x7f060049
 int id home 0x7f060014
 int id homeAsUp 0x7f060005
 int id icon 0x7f06002a

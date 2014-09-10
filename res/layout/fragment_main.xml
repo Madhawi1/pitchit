@@ -97,5 +97,16 @@
      android:layout_marginTop="31dp"
      android:text="@string/stop" 
      />
- 
+
+ <RatingBar
+     android:id="@+id/feedbackBar"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_below="@+id/btnPlay"
+     android:layout_centerHorizontal="true"
+     android:layout_marginTop="36dp"
+     android:isIndicator="true"
+     android:rating="0"
+     android:stepSize="0.5"
+   />
  </RelativeLayout>
