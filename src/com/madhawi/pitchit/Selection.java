@@ -54,12 +54,10 @@ public class Selection extends Activity{
 	 private int lowCount=0;
 	 private int highCount=0;
 	 
-	 //variables for giving feedback
-	// public RatingBar feedbackBar = (RatingBar) findViewById(R.id.feedbackBar);
-		
-
+	 
 	 Handler handler = new Handler();
 	 
+	 //
 	 public void trackPitch(){
 	 
      Toast.makeText(Selection.this, "Recording voice",Toast.LENGTH_LONG).show();
@@ -84,20 +82,7 @@ public class Selection extends Activity{
 		 
 		 Complex[] fftResult = FFT.fft(complexData);
 
-		 double arg[]=new double[fftResult.length];
-		 double mag[]=new double[fftResult.length];
-		 String str="";
-		 
-		/* for (int i=0;i<fftResult.length;i++){
-			 arg[i]=Math.atan2(fftResult[i].re(),fftResult[i].im());
-			 mag[i]=Math.sqrt(fftResult[i].re()*fftResult[i].re()+fftResult[i].im()*fftResult[i].im());
-			// System.err.print(mag[i]+",");
-			 str=str+mag[i]+",";
-			 
-		 }*/
-		 //System.err.println(str);
 		 int index=0;
-		 int index2=0;
 		 double max=0;
 		 matchCount=0;
 		 double frequency=0;
@@ -115,30 +100,11 @@ public class Selection extends Activity{
 		 for (int i=0;i<fftResult.length;i++){
 			 double magnitude=fftResult[i].re()*fftResult[i].re()+fftResult[i].im()*fftResult[i].im();
 			  
-		//	 str=str+Math.pow(magnitude, .5)+",";
 		 }
-		 float rating= Float.parseFloat("2.5");
-		// feedbackBar.setRating(rating);
 		 frequency=((double)samplerate*index)/(double)fftResult.length;
-		 //comparePitch(frequency);
-		 //str=str+frequency+",";
-		 Toast.makeText(Selection.this, "f: "+freqOfTone+" f2: "+frequency,Toast.LENGTH_LONG).show();
+		
 		 makeFeedback(frequency);
-		 Toast.makeText(Selection.this, "f: "+freqOfTone+" f2: "+frequency,Toast.LENGTH_LONG).show();
-			
-		/* if(matchCount>=10){
-			 Toast.makeText(Selection.this, "Match ",Toast.LENGTH_LONG).show();
-			 
-		 }
-		 else if(lowCount>highCount){
-			 Toast.makeText(Selection.this, "Low",Toast.LENGTH_LONG).show();
-			 
-		 }
-		 else{
-			 Toast.makeText(Selection.this, "High ",Toast.LENGTH_LONG).show();
-			 
-		 }*/
-				 
+		 Toast.makeText(Selection.this, "Your frequency:   "+frequency+"Hz  Expected:         "+freqOfTone + "Hz",Toast.LENGTH_LONG).show();
 		 
 	 }
 	 public void comparePitch(double voiceFrequency){
@@ -155,42 +121,57 @@ public class Selection extends Activity{
 		}
 	
 	 }
+	 
+	 //Display feedback to the user according to pitching level
 	 public void makeFeedback(double voiceFrequency){
-		 double difference=freqOfTone-voiceFrequency;
+		 double difference=voiceFrequency-freqOfTone;
 		 
 		 RatingBar feedbackBar = (RatingBar) findViewById(R.id.feedbackBar);
 		 ProgressBar lowBar= (ProgressBar) findViewById(R.id.lowBar);
 		 ProgressBar highBar= (ProgressBar) findViewById(R.id.highBar);
-		 
-			if(difference<4 && difference>-4 ){
+		 int difInt=(int)difference;
+			
+		 if(difference<4 && difference>-4 ){
 				feedbackBar.setRating(1);
 			}
-			else if(difference>0){
-				 lowBar.setProgress((int)difference);
-	}
-
+			else if(difference<0){
+		
+				lowBar.setProgress(-difInt);
+			}
 			else {
-				highBar.setProgress((int)difference);
+				highBar.setProgress(difInt);
 			}
 
 				 }
+	 
+	 //Get the note selected by user and set it as the note selected
 	 public void setFreqTone(){
+		 
 		//get the selected note from the group of radio buttons
 		 final RadioGroup rgNotes = (RadioGroup) findViewById(R.id.rgNotes);
 		 
 		 RadioButton selectRadio = (RadioButton) findViewById(rgNotes.getCheckedRadioButtonId());
          String note = selectRadio.getText().toString();
-         
     	 
          //Set the frequency of the selected note
          freqOfTone=getFrequency(note.charAt(0));
-         
+  	 
+	 }
+	 
+	 //Referesh the feedback bars and set all of them empty
+	 public void refresh(){
+		 RatingBar feedbackBar = (RatingBar) findViewById(R.id.feedbackBar);
+		 ProgressBar lowBar= (ProgressBar) findViewById(R.id.lowBar);
+		 ProgressBar highBar= (ProgressBar) findViewById(R.id.highBar);
+		 
+		 feedbackBar.setRating(0);
+		 lowBar.setProgress(0);
+		 highBar.setProgress(0);
 		 
 	 }
 	 
+	 //Start recording voice
 	 public void startRecording(){
-		 setFreqTone();
-		 trackPitch();
 		 recorder.startRecording();
 		 final Thread recordingThread = new Thread(new Runnable() {
 	            public void run() {
@@ -204,6 +185,8 @@ public class Selection extends Activity{
 	        recordingThread.start();
 		 
 	 }
+	 
+	 //Stop recording voice
 	 public void stopRecording(){
 		 if (null != recorder) {
 		        isRecording = false;
@@ -220,19 +203,25 @@ public class Selection extends Activity{
 		 }
 		 
 	 }
+	 
+	 //Set handlers for buttons
 	 private void setButtonHandlers() {
 		    ((Button) findViewById(R.id.btnRecord)).setOnClickListener(btnClick);
 		    ((Button) findViewById(R.id.btnStop)).setOnClickListener(btnClick);
 		    ((Button) findViewById(R.id.btnPlay)).setOnClickListener(btnClick);
 			
 	 }
-
+	 
+	 //Set onclick listners of buttons
 	 private View.OnClickListener btnClick = new View.OnClickListener() {
 		    public void onClick(View v) {
 		        switch (v.getId()) {
 		        case R.id.btnRecord: {
 		            enableButtons_Rec(true);
-		            startRecording();
+		            refresh();
+		            setFreqTone();
+		            trackPitch();
+		   		    startRecording();
 		            break;
 		        }
 		        case R.id.btnStop: {
@@ -249,6 +238,7 @@ public class Selection extends Activity{
 		        }
 		    }
 		};
+		
 	//Enable the selected button
 	private void enableButton(int id, boolean isEnable) {
 		    ((Button) findViewById(id)).setEnabled(isEnable);
