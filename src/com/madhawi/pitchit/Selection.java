@@ -22,6 +22,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
@@ -54,7 +55,7 @@ public class Selection extends Activity{
 	 private int highCount=0;
 	 
 	 //variables for giving feedback
-	 public RatingBar feedbackBar = (RatingBar) findViewById(R.id.feedbackBar);
+	// public RatingBar feedbackBar = (RatingBar) findViewById(R.id.feedbackBar);
 		
 
 	 Handler handler = new Handler();
@@ -96,6 +97,7 @@ public class Selection extends Activity{
 		 }*/
 		 //System.err.println(str);
 		 int index=0;
+		 int index2=0;
 		 double max=0;
 		 matchCount=0;
 		 double frequency=0;
@@ -112,15 +114,19 @@ public class Selection extends Activity{
 		 }
 		 for (int i=0;i<fftResult.length;i++){
 			 double magnitude=fftResult[i].re()*fftResult[i].re()+fftResult[i].im()*fftResult[i].im();
-			 str=str+Math.pow(magnitude, .5)+",";
+			  
+		//	 str=str+Math.pow(magnitude, .5)+",";
 		 }
 		 float rating= Float.parseFloat("2.5");
-		 feedbackBar.setRating(rating);
+		// feedbackBar.setRating(rating);
 		 frequency=((double)samplerate*index)/(double)fftResult.length;
 		 //comparePitch(frequency);
 		 //str=str+frequency+",";
 		 Toast.makeText(Selection.this, "f: "+freqOfTone+" f2: "+frequency,Toast.LENGTH_LONG).show();
-	/*	 if(matchCount>=10){
+		 makeFeedback(frequency);
+		 Toast.makeText(Selection.this, "f: "+freqOfTone+" f2: "+frequency,Toast.LENGTH_LONG).show();
+			
+		/* if(matchCount>=10){
 			 Toast.makeText(Selection.this, "Match ",Toast.LENGTH_LONG).show();
 			 
 		 }
@@ -151,40 +157,39 @@ public class Selection extends Activity{
 	 }
 	 public void makeFeedback(double voiceFrequency){
 		 double difference=freqOfTone-voiceFrequency;
-			if(difference<1){
-				feedbackBar.setRating(5);
+		 
+		 RatingBar feedbackBar = (RatingBar) findViewById(R.id.feedbackBar);
+		 ProgressBar lowBar= (ProgressBar) findViewById(R.id.lowBar);
+		 ProgressBar highBar= (ProgressBar) findViewById(R.id.highBar);
+		 
+			if(difference<4 && difference>-4 ){
+				feedbackBar.setRating(1);
 			}
-			else if(difference<2){
-				feedbackBar.setRating((float)4.5);
+			else if(difference>0){
+				 lowBar.setProgress((int)difference);
+	}
+
+			else {
+				highBar.setProgress((int)difference);
 			}
 
-			else if(difference<3){
-				feedbackBar.setRating(4);
-			}
-
-			else if(difference<10){
-				feedbackBar.setRating((float)3.5);
-			}
-
-			else if(difference<15){
-				feedbackBar.setRating(3);
-			}
-
-			else if(difference<20){
-				feedbackBar.setRating((float)2.5);
-			}
-
-			else if(difference<25){
-				feedbackBar.setRating((float)2);
-			}
-			else if(difference<30){
-				feedbackBar.setRating((float)1);
-			}
-			else
-				feedbackBar.setRating((float)0.5);
-			
+				 }
+	 public void setFreqTone(){
+		//get the selected note from the group of radio buttons
+		 final RadioGroup rgNotes = (RadioGroup) findViewById(R.id.rgNotes);
+		 
+		 RadioButton selectRadio = (RadioButton) findViewById(rgNotes.getCheckedRadioButtonId());
+         String note = selectRadio.getText().toString();
+         
+    	 
+         //Set the frequency of the selected note
+         freqOfTone=getFrequency(note.charAt(0));
+         
+		 
 	 }
+	 
 	 public void startRecording(){
+		 setFreqTone();
 		 trackPitch();
 		 recorder.startRecording();
 		 final Thread recordingThread = new Thread(new Runnable() {
@@ -275,20 +280,10 @@ public class Selection extends Activity{
 	//play the selected note
 	public void play(){
 		
-		 final RadioGroup rgNotes = (RadioGroup) findViewById(R.id.rgNotes);
-		 isPlaying=true;
+	  isPlaying=true;
 		
-		 //get the selected note from the group of radio buttons
-		 RadioButton selectRadio = (RadioButton) findViewById(rgNotes.getCheckedRadioButtonId());
-         String note = selectRadio.getText().toString();
-         
-         //Show a toast "Playing note 'C,D, etc'" indicating that the note is playing
-         Toast.makeText(Selection.this, "Playing note " + note,Toast.LENGTH_LONG).show();
-         char noteC=note.charAt(0);
-	 
-         //Set the frequency of the selected note
-         freqOfTone=getFrequency(noteC);
-	 
+	  setFreqTone(); 
+        
       final Thread thread = new Thread(new Runnable() {
       public void run() {
           genTone();
@@ -297,17 +292,13 @@ public class Selection extends Activity{
               public void run() {
                   playSound();
                  
-                 /* final Thread watingThread = new Thread(new Runnable() {
-      	            public void run() {*/
-      	            	try {
+                    	try {
 							Thread.sleep(3000);
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-      	          //  }});
-                 // watingThread.start();
-                isPlaying =false;
+      	        isPlaying =false;
                 enableButtons_Play(isPlaying);
                 	
                   

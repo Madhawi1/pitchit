@@ -108,5 +108,34 @@
      android:isIndicator="true"
      android:rating="0"
      android:stepSize="0.5"
+     android:numStars="1"
    />
+
+ <ProgressBar
+     android:id="@+id/lowBar"
+	 style="?android:attr/progressBarStyleHorizontal"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignBottom="@+id/feedbackBar"
+     android:layout_alignLeft="@+id/btnPlay"
+     android:max="50"
+     android:maxHeight="70dp"
+     android:maxWidth="150dip"
+     android:minHeight="50dip"
+     android:minWidth="120dip"
+     android:rotation="180" />
+
+ <ProgressBar
+     android:id="@+id/highBar"
+     style="?android:attr/progressBarStyleHorizontal"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_alignBottom="@+id/feedbackBar"
+     android:layout_toRightOf="@+id/feedbackBar"
+     android:max="50"
+     android:maxHeight="70dp"
+     android:maxWidth="150dip"
+     android:minHeight="50dip"
+     android:minWidth="120dip" />
+	
  </RelativeLayout>
