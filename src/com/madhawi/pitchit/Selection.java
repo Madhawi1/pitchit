@@ -7,6 +7,9 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.LayerDrawable;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -127,6 +130,9 @@ public class Selection extends Activity{
 		 double difference=voiceFrequency-freqOfTone;
 		 
 		 RatingBar feedbackBar = (RatingBar) findViewById(R.id.feedbackBar);
+		 LayerDrawable stars = (LayerDrawable) feedbackBar.getProgressDrawable();
+		 stars.getDrawable(2).setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
+		 
 		 ProgressBar lowBar= (ProgressBar) findViewById(R.id.lowBar);
 		 ProgressBar highBar= (ProgressBar) findViewById(R.id.highBar);
 		 int difInt=(int)difference;
