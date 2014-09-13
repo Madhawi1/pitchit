@@ -45,6 +45,7 @@ public class Selection extends Activity{
 	 private final byte generatedSnd[] = new byte[2 * numSamples];
 	 private Thread recordingThread = null;
 	 private boolean isPlaying=false;
+	 private  String note=null;
 	
 	 //variables for tracking pitch
 	 private boolean isRecording=false;
@@ -142,7 +143,7 @@ public class Selection extends Activity{
 		 final RadioGroup rgNotes = (RadioGroup) findViewById(R.id.rgNotes);
 		 
 		 RadioButton selectRadio = (RadioButton) findViewById(rgNotes.getCheckedRadioButtonId());
-         String note = selectRadio.getText().toString();
+		 note = selectRadio.getText().toString();
     	 
          //Set the frequency of the selected note
          freqOfTone=getFrequency(note.charAt(0));
@@ -275,7 +276,6 @@ public class Selection extends Activity{
 }
 	//play the selected note
 	public void play(){
-		
 	  isPlaying=true;
 		
 	  setFreqTone(); 

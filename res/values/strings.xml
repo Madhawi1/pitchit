@@ -11,9 +11,9 @@
     <string name="g">G</string>
     <string name="a">A</string>
     <string name="b">B</string>
-    <string name="play">Play</string>
+    <string name="play">Listen </string>
     <string name="stop">Stop</string>
-    <string name="record">Test voice</string>
+    <string name="record">Try yourself</string>
     <string name="perfect">Perfect!</string>
     <string name="low">Low</string>
     <string name="high">High</string>
