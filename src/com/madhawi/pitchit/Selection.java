@@ -60,22 +60,7 @@ public class Selection extends Activity{
 	 
 	 Handler handler = new Handler();
 	 
-	 //
-	 public void trackPitch(){
 	 
-     Toast.makeText(Selection.this, "Recording voice",Toast.LENGTH_LONG).show();
-     //get the buffer size to use with this audio record
-	 bufferSize = AudioRecord.getMinBufferSize(samplerate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)*3;
-	 int bufferSize1=bufferSize ; 
-	 bufferSize =(int)Math.pow(2, Integer.toBinaryString(bufferSize).length());
-		//instantiate the AudioRecorder
-	 recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,samplerate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT,bufferSize); 
-	 	
-	 isRecording = true; //variable to use start or stop recording
-	 audioData = new short [bufferSize]; //short array that pcm data is put into.
-
-	 }
-
 	 public void analyze(){
 		 complexData = new Complex[audioData.length];
 			
@@ -135,17 +120,17 @@ public class Selection extends Activity{
 		 
 		 ProgressBar lowBar= (ProgressBar) findViewById(R.id.lowBar);
 		 ProgressBar highBar= (ProgressBar) findViewById(R.id.highBar);
-		 int difInt=(int)difference;
+		 int differenceInt=(int)difference;
 			
 		 if(difference<4 && difference>-4 ){
 				feedbackBar.setRating(1);
 			}
 			else if(difference<0){
 		
-				lowBar.setProgress(-difInt);
+				lowBar.setProgress(-differenceInt);
 			}
 			else {
-				highBar.setProgress(difInt);
+				highBar.setProgress(differenceInt);
 			}
 
 				 }
@@ -178,19 +163,38 @@ public class Selection extends Activity{
 	 
 	 //Start recording voice
 	 public void startRecording(){
+		 
+		 	
+		 //get the buffer size to use with this audio record
+		 bufferSize = AudioRecord.getMinBufferSize(samplerate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT)*3;
+		 bufferSize =(int)Math.pow(2, Integer.toBinaryString(bufferSize).length());
+		
+		 //instantiate the AudioRecorder
+		 recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,samplerate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT,bufferSize); 
+		 	
+		 isRecording = true; //variable to use start or stop recording
+		 audioData = new short [bufferSize]; //short array that pcm data is put into.
+
+	  	// Set the end time to startTime + 2s 
+		 long startTime = System.currentTimeMillis();
+		 final long endTime = startTime + 2*1000; 
 		 recorder.startRecording();
+		 
 		 final Thread recordingThread = new Thread(new Runnable() {
-	            public void run() {
-	                
-	                    	while(isRecording){
-	           	       		 recorder.read(audioData,0,bufferSize);
-	           	       		}
-	                    }
+	            
+			public void run() {
+				while(System.currentTimeMillis() < endTime){
+							recorder.read(audioData,0,bufferSize);
+	       		}
+							isRecording=false;
+							enableButtons_Rec(false);
+							stopRecording();
+						    
+	                         }
 	            }
 	        );
-	        recordingThread.start();
-		 
-	 }
+	        recordingThread.run();
+	    }
 	 
 	 //Stop recording voice
 	 public void stopRecording(){
@@ -205,15 +209,18 @@ public class Selection extends Activity{
 		        recordingThread = null;
 		       
 		        analyze();
-		        
+		            
 		 }
 		 
+	 }
+	 public void setText(String text){
+		 Button button= (Button) findViewById(R.id.btnRecord);
+		 button.setText(text);
 	 }
 	 
 	 //Set handlers for buttons
 	 private void setButtonHandlers() {
 		    ((Button) findViewById(R.id.btnRecord)).setOnClickListener(btnClick);
-		    ((Button) findViewById(R.id.btnStop)).setOnClickListener(btnClick);
 		    ((Button) findViewById(R.id.btnPlay)).setOnClickListener(btnClick);
 			
 	 }
@@ -223,16 +230,11 @@ public class Selection extends Activity{
 		    public void onClick(View v) {
 		        switch (v.getId()) {
 		        case R.id.btnRecord: {
-		            enableButtons_Rec(true);
+		        	Toast.makeText(Selection.this, "Recording voice",Toast.LENGTH_LONG).show();
+		        	enableButtons_Rec(true);
 		            refresh();
 		            setFreqTone();
-		            trackPitch();
-		   		    startRecording();
-		            break;
-		        }
-		        case R.id.btnStop: {
-		            enableButtons_Rec(false);
-		            stopRecording();
+		            startRecording();
 		            break;
 		        }
 		        case R.id.btnPlay: {
@@ -252,14 +254,12 @@ public class Selection extends Activity{
 	 //Select buttons which need to be enabled when recording voice
 	private void enableButtons_Rec(boolean isRecording) {
 		    enableButton(R.id.btnRecord, !isRecording);
-		    enableButton(R.id.btnStop, isRecording);
 		    enableButton(R.id.btnPlay, !isRecording);
 		}
 	
 	//Select buttons which need to be enabled when playing a note
 	private void enableButtons_Play(boolean isPlaying) {
 		    enableButton(R.id.btnRecord, !isPlaying);
-		    enableButton(R.id.btnStop, !isPlaying);
 		    enableButton(R.id.btnPlay, !isPlaying);
 		}
 

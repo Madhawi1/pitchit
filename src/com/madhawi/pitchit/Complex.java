@@ -1,9 +1,5 @@
 package com.madhawi.pitchit;
 
-
-
-
-
 /*************************************************************************
  *  Compilation:  javac Complex.java
  *  Execution:    java Complex
