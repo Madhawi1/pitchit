@@ -83,34 +83,9 @@
      android:layout_height="wrap_content"
      android:layout_alignRight="@+id/high"
      android:layout_alignTop="@+id/rgNotes"
-     android:layout_toRightOf="@+id/textView1"
+     android:layout_toRightOf="@+id/perfect"
      android:text="@string/record"
      android:textSize="15sp" />
-
- <ProgressBar
-     android:id="@+id/lowBar"
-     style="@android:style/Widget.ProgressBar.Horizontal"
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:layout_alignBottom="@+id/feedbackBar"
-     android:layout_alignLeft="@+id/btnPlay"
-     android:layout_alignTop="@+id/highBar"
-     android:max="100"
-     android:maxHeight="70dp"
-     android:maxWidth="150dip"
-     android:minHeight="20dip"
-     android:minWidth="120dip"
-     android:rotation="180" />
-
- <TextView
-     android:id="@+id/perfect"
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:layout_alignLeft="@+id/feedbackBar"
-     android:layout_below="@+id/btnPlay"
-     android:layout_marginTop="37dp"
-     android:text="@string/perfect"
-     android:textAppearance="?android:attr/textAppearanceSmall" />
 
  <TextView
      android:id="@+id/high"
@@ -130,17 +105,19 @@
      android:text="@string/low"
      android:textAppearance="?android:attr/textAppearanceSmall" />
 
- <RatingBar
-     android:id="@+id/feedbackBar"
+ <ProgressBar
+     android:id="@+id/lowBar"
+     style="@android:style/Widget.ProgressBar.Horizontal"
      android:layout_width="wrap_content"
      android:layout_height="wrap_content"
-     android:layout_below="@+id/perfect"
-     android:layout_toRightOf="@+id/lowBar"
-     android:isIndicator="true"
-     android:minHeight="57dp"
-     android:numStars="1"
-     android:rating="0"
-     android:stepSize="0.5" />
+     android:layout_alignBottom="@+id/feedbackBar"
+     android:layout_alignLeft="@+id/btnPlay"
+     android:max="100"
+     android:maxHeight="70dp"
+     android:maxWidth="150dip"
+     android:minHeight="20dip"
+     android:minWidth="120dip"
+     android:rotation="180" />
 
  <ProgressBar
      android:id="@+id/highBar"
@@ -148,11 +125,33 @@
      android:layout_width="wrap_content"
      android:layout_height="wrap_content"
      android:layout_alignBottom="@+id/feedbackBar"
-     android:layout_toRightOf="@+id/perfect"
+     android:layout_toRightOf="@+id/feedbackBar"
      android:max="100"
      android:maxHeight="70dp"
      android:maxWidth="150dip"
      android:minHeight="20dip"
      android:minWidth="120dip" />
+
+ <RatingBar
+     android:id="@+id/feedbackBar"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_below="@+id/btnPlay"
+     android:layout_marginTop="42dp"
+     android:layout_toRightOf="@+id/lowBar"
+     android:isIndicator="true"
+     android:minHeight="57dp"
+     android:numStars="1"
+     android:rating="0"
+     android:stepSize="0.5" />
+
+ <TextView
+     android:id="@+id/perfect"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:layout_above="@+id/high"
+     android:layout_toLeftOf="@+id/highBar"
+     android:text="@string/perfect"
+     android:textAppearance="?android:attr/textAppearanceSmall" />
 	
  </RelativeLayout>

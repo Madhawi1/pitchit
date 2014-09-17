@@ -1,7 +1,6 @@
 package com.madhawi.pitchit;
 
-import java.io.File;
-import java.io.IOException;
+
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -14,9 +13,7 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.media.MediaRecorder.AudioSource;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,9 +29,6 @@ import android.widget.RatingBar;
 import android.widget.Toast;
 
 public class Selection extends Activity{
-	 private MediaPlayer player ;
-	 private MediaRecorder mRecorder;
-	 private File audiofile;
 	 
 	 //variables for generating and playing the tone
 	 private final int duration = 3; // seconds
@@ -54,15 +48,16 @@ public class Selection extends Activity{
 	 int bufferSize;
 	 int samplerate =8000;
 	 private Complex[] complexData;
-	 private int matchCount=0;
-	 private int lowCount=0;
-	 private int highCount=0;
 	 
 	 
 	 Handler handler = new Handler();
 	 
-	 
+	 //Analyze the audio data using fft class
 	 public void analyze(){
+		
+		 int index=0;
+		 double max=0;
+		 double frequency=0;
 		 complexData = new Complex[audioData.length];
 			
 		 for (int i = 0; i < complexData.length; i++) {
@@ -71,10 +66,9 @@ public class Selection extends Activity{
 		 
 		 Complex[] fftResult = FFT.fft(complexData);
 
-		 int index=0;
-		 double max=0;
-		 matchCount=0;
-		 double frequency=0;
+		 
+		 
+		 //Define the minimum and maximum values of the range
 		 int minValue=(int)254.258*fftResult.length/samplerate;
 		 int maxValue=(int)555.29*fftResult.length/samplerate;
 		 
@@ -86,31 +80,15 @@ public class Selection extends Activity{
 				 }
 			 
 		 }
-		 for (int i=0;i<fftResult.length;i++){
-			 double magnitude=fftResult[i].re()*fftResult[i].re()+fftResult[i].im()*fftResult[i].im();
-			  
-		 }
+		 //Get the frequency of the point within the range with maximum magnitude
 		 frequency=((double)samplerate*index)/(double)fftResult.length;
 		
 		 makeFeedback(frequency);
 		 Toast.makeText(Selection.this, "Your frequency:   "+frequency+"Hz  Expected:         "+freqOfTone + "Hz",Toast.LENGTH_LONG).show();
 		 
 	 }
-	 public void comparePitch(double voiceFrequency){
-		double lowPitch= freqOfTone-(freqOfTone*0.015);
-		double highPitch= freqOfTone+(freqOfTone*0.015);
-		if(voiceFrequency>=lowPitch && voiceFrequency <= highPitch){
-			matchCount++;
-		}
-		else if(voiceFrequency<lowPitch){
-			lowCount++;
-		}
-		else{
-			highCount++;
-		}
-	
-	 }
 	 
+	  
 	 //Display feedback to the user according to pitching level
 	 public void makeFeedback(double voiceFrequency){
 		 double difference=voiceFrequency-freqOfTone;
@@ -122,7 +100,8 @@ public class Selection extends Activity{
 		 ProgressBar lowBar= (ProgressBar) findViewById(R.id.lowBar);
 		 ProgressBar highBar= (ProgressBar) findViewById(R.id.highBar);
 		 int differenceInt=(int)difference;
-			
+		
+		 //display feedback in star(rating bar) and progress bars
 		 if(difference<4 && difference>-4 ){
 				feedbackBar.setRating(1);
 			}
@@ -190,6 +169,7 @@ public class Selection extends Activity{
 							isRecording=false;
 							enableButtons_Rec(false);
 							stopRecording();
+							analyze();
 						    
 	                         }
 	            }
@@ -209,16 +189,10 @@ public class Selection extends Activity{
 		        recorder = null;
 		        recordingThread = null;
 		       
-		        analyze();
-		            
 		 }
 		 
 	 }
-	 public void setText(String text){
-		 Button button= (Button) findViewById(R.id.btnRecord);
-		 button.setText(text);
-	 }
-	 
+	  
 	 //Set handlers for buttons
 	 private void setButtonHandlers() {
 		    ((Button) findViewById(R.id.btnRecord)).setOnClickListener(btnClick);
@@ -231,7 +205,6 @@ public class Selection extends Activity{
 		    public void onClick(View v) {
 		        switch (v.getId()) {
 		        case R.id.btnRecord: {
-		        	Toast.makeText(Selection.this, "Recording voice",Toast.LENGTH_LONG).show();
 		        	enableButtons_Rec(true);
 		            refresh();
 		            setFreqTone();
@@ -359,96 +332,12 @@ public class Selection extends Activity{
         audioTrack.play();
     }
 
-
-	
-	
-	//Record voice
-	public void record(View view){
-		//Show a toast "Recording Voice" indicating that recording has started
-		Toast.makeText(Selection.this, "Recording",Toast.LENGTH_LONG).show();
-
-		startRecording();
-		    
-		try {
-			//Keep recording for 5 seconds
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		};
-		//Shows a toast "Done" indicating that recording has finished
-		Toast.makeText(Selection.this, "Done",Toast.LENGTH_LONG).show();
-		 
-		stopRecording();
-	}
-	
-	//Start recording voice
-	private void startRecording1() {
-			
-		 try {
-			  //create a file with prefix 'sound' and suffix '.3gp'
-		      audiofile = File.createTempFile("sound", ".3gp");
-		    } catch (IOException e) {
-		       return;
-		    }
-		 
-		 	//Make a media recorder to record voice
-		    mRecorder = new MediaRecorder();
-		    mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-		    mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-		    mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-		    mRecorder.setOutputFile(audiofile.getAbsolutePath());
-		    
-		    try {
-		    	//Prepares the recorder to start capturing voice
-				mRecorder.prepare();
-			} catch (IllegalStateException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		    //Start the recorder
-		    mRecorder.start();
-		  }
-	
-	//Stop recording voice	
-	private void stopRecording1() {
-		
-	    mRecorder.stop();
-	    //Releases the resources associated with the recorder
-	    mRecorder.release();
-	    addRecordingToMediaLibrary();
-	   
-	}	 
-	
-	//Add the recorded file to the media library
-	protected void addRecordingToMediaLibrary() {
-		
-	    ContentValues values = new ContentValues(4);
-	    long current = System.currentTimeMillis();
-	    values.put(MediaStore.Audio.Media.TITLE, "audio" + audiofile.getName());
-	    values.put(MediaStore.Audio.Media.DATE_ADDED, (int) (current / 1000));
-	    values.put(MediaStore.Audio.Media.MIME_TYPE, "audio/3gpp");
-	    values.put(MediaStore.Audio.Media.DATA, audiofile.getAbsolutePath());
-	    ContentResolver contentResolver = getContentResolver();
-
-	    Uri base = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-	    Uri newUri = contentResolver.insert(base, values);
-
-	    sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, newUri));
-	    
-	    //Shows a toast that gives the path of the added file
-	    Toast.makeText(this, "Added File " + newUri, Toast.LENGTH_LONG).show();
-	  }
-	
 	@Override
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
 		if(isRecording){
-			stopRecording1();
+			stopRecording();
 			enableButtons_Rec(isRecording);
 			
 		}
